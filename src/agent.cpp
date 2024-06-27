@@ -169,7 +169,7 @@ namespace apf
       double distance = (obstacles[obs_id].position - state.position).norm();
       double Q = param.radius + param.threshold;
       if(distance < Q){
-        u_obs = param.eta * (1 / Q - 1 / (distance) * 1 / (distance * distance) * (state.position - obstacles[]));
+        u_obs = param.eta * ((1 / Q - 1 / (distance)) * 1 / (distance * distance) * (state.position - obstacles[obs_id].position) / distance);
       }
     }
 
