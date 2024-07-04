@@ -13,8 +13,8 @@ namespace apf
     agent_id = this->get_parameter("agent_id").as_int();
 
     // Mission file name
-    this->declare_parameter("mission_single_agent", "/home/amr/ros2_ws/src/assi5_artificial_potential_field/mission/mission_single_agent.yaml");
-    std::string mission_file_name = this->get_parameter("mission_single_agent").as_string();
+    this->declare_parameter("mission_multi_agent_30", "/home/amr/ros2_ws/src/assi5_artificial_potential_field/mission/mission_multi_agent_30.yaml");
+    std::string mission_file_name = this->get_parameter("mission_multi_agent_30").as_string();
 
     // Mission
     YAML::Node mission = YAML::LoadFile(mission_file_name);
@@ -150,7 +150,6 @@ namespace apf
   Vector3d ApfAgent::apf_controller()
   {
     // Attraction force
-    // Todo : find d*goal
     Vector3d u_goal;
     if ((goal - state.position).norm() < 1)
     {
@@ -164,12 +163,23 @@ namespace apf
     // Repulsion force
     Vector3d u_obs(0, 0, 0);
 
+    //multi agents
+    for (size_t id = 0; id < number_of_agents; id++)
+    {
+      double distance = (agent_positions[id] - state.position).norm();
+      double Q = param.q * (2 * param.radius);
+      if(distance < Q){
+        u_obs += param.obs * ((1 / Q - 1 / (distance)) * 1 / (distance * distance) * (agent_positions[id] - state.position) / distance);
+      }
+    }
+
+    //single agent
     for (size_t obs_id = 0; obs_id < number_of_obstacles; obs_id++)
     {
       double distance = (obstacles[obs_id].position - state.position).norm();
-      double Q = param.radius + param.threshold;
+      double Q = param.q * (param.radius + obstacles[obs_id].radius);
       if(distance < Q){
-        u_obs = param.eta * ((1 / Q - 1 / (distance)) * 1 / (distance * distance) * (state.position - obstacles[obs_id].position) / distance);
+        u_obs = param.obs * ((1 / Q - 1 / (distance)) * 1 / (distance * distance) * (obstacles[obs_id].position - state.position) / distance);
       }
     }
 
