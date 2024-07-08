@@ -13,7 +13,7 @@ namespace apf
     agent_id = this->get_parameter("agent_id").as_int();
 
     // Mission file name
-    this->declare_parameter("mission_multi_agent_30", "/home/amr/ros2_ws/src/assi5_artificial_potential_field/mission/mission_multi_agent_30.yaml");
+    this->declare_parameter("mission_multi_agent_30", "/home/nuc2/ros2_ws/src/assi5_artificial_potential_field/mission/mission_multi_agent_30.yaml");
     std::string mission_file_name = this->get_parameter("mission_multi_agent_30").as_string();
 
     // Mission
@@ -104,15 +104,19 @@ namespace apf
 
   void ApfAgent::listen_tf()
   {
-    geometry_msgs::msg::TransformStamped t;
-    try
-    {
-      t = tf_buffer->lookupTransform(
-          "world", "agent" + std::to_string(agent_id), tf2::TimePointZero);
-    }
+    for (size_t id = 0; id < number_of_agents; id++){
+      geometry_msgs::msg::TransformStamped t;
+      try
+      {
+        t = tf_buffer->lookupTransform("world", "agent" + std::to_string(id), tf2::TimePointZero);
+      }
     catch (const tf2::TransformException &ex)
-    {
-      RCLCPP_WARN(this->get_logger(), "Could not transform : %s", ex.what());
+      {
+        RCLCPP_WARN(this->get_logger(), "Could not transform : %s", ex.what());
+      }
+      
+      Vector3d real_position = Vector3d(t.transform.translation.x, t.transform.translation.y, t.transform.translation.z);
+      agent_positions[id] = real_position;
     }
   }
 
@@ -133,7 +137,7 @@ namespace apf
     t.header.stamp = this->get_clock()->now();
     t.header.frame_id = "/world";
     t.child_frame_id = "agent" + std::to_string(agent_id);
-
+    
     t.transform.translation.x = state.position.x();
     t.transform.translation.y = state.position.y();
     t.transform.translation.z = state.position.z();
@@ -143,8 +147,8 @@ namespace apf
     t.transform.rotation.x = 0;
     t.transform.rotation.y = 0;
     t.transform.rotation.z = 0;
-
-    tf_broadcaster->sendTransform(t);
+      
+    tf_broadcaster->sendTransform(t);    
   }
 
   Vector3d ApfAgent::apf_controller()
@@ -162,10 +166,13 @@ namespace apf
 
     // Repulsion force
     Vector3d u_obs(0, 0, 0);
-
+    
     //multi agents
     for (size_t id = 0; id < number_of_agents; id++)
     {
+      if (agent_id == id){
+        continue;
+      }
       double distance = (agent_positions[id] - state.position).norm();
       double Q = param.q * (2 * param.radius);
       if(distance < Q){

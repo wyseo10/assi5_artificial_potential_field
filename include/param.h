@@ -19,10 +19,10 @@ public:
 
   // APF
   //TODO: add parameters
-  double zeta = 1.0;
-  double damp = 1.0;
-  double obs = 20.0;
-  double q = 3.0;
+  double zeta = 0.8;
+  double damp = 1.5;
+  double obs = 30.0;
+  double q = 2.5;
 
   // Constant
   double infinity = 100000;

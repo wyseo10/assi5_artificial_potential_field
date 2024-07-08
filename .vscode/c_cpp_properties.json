@@ -6,11 +6,8 @@
         "limitSymbolsToIncludedHeaders": false
       },
       "includePath": [
-        "/home/amr/ros2_ws/install/crazyflie_interfaces/include/**",
         "/opt/ros/iron/include/**",
-        "/home/amr/ros2_ws/src/assi5_artificial_potential_field/include/**",
-        "/home/amr/ros2_ws/src/learning_tf2_cpp/include/**",
-        "/home/amr/ros2_ws/src/ros2_tutorial/include/**",
+        "/home/nuc2/ros2_ws/src/assi5_artificial_potential_field/include/**",
         "/usr/include/**"
       ],
       "name": "ROS",

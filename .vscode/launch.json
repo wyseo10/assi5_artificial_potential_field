@@ -3,5 +3,18 @@
     // Hover to view descriptions of existing attributes.
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
-    "configurations": []
+    "configurations": [
+        {
+            "name": "ROS: Launch",
+            "request": "launch",
+            "target": "/home/nuc2/ros2_ws/install/apf/share/apf/launch/multi_agent_simulation_launch.py",
+            "launch": [
+                "rviz",
+                "gz",
+                "gzclient",
+                "gzserver"
+            ],
+            "type": "ros"
+        }
+    ]
 }
